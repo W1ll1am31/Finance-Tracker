@@ -2,7 +2,77 @@
   <v-app dark>
     <v-toolbar fixed app>
       <v-toolbar-title v-text="title"></v-toolbar-title>
-      
+      <v-speed-dial
+        v-model="fab"
+        absolute
+        direction="bottom"
+        transition="slide-y-transition"
+        right
+      >
+        <v-btn
+          slot="activator"
+          color="blue darken-2"
+          dark
+          fab
+          hover
+          v-model="fab"
+        >
+          <v-icon>attach_money</v-icon>
+          <v-icon>close</v-icon>
+        </v-btn>
+        <v-tooltip v-model="fab" left>
+          <v-btn
+            fab
+            dark
+            small
+            color="blue"
+            slot="activator"
+            @click="$router.push('/')"
+          >
+            <v-icon>home</v-icon>
+          </v-btn>
+          <span>Home</span>
+        </v-tooltip>
+        <v-tooltip v-model="fab" left>
+          <v-btn
+            fab
+            dark
+            small
+            color="green"
+            slot="activator"
+            @click="$router.push('/newForm')"
+          >
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span>Add new expense</span>
+        </v-tooltip>
+        <v-tooltip v-model="fab" left>
+          <v-btn
+            fab
+            dark
+            small
+            color="indigo"
+            slot="activator"
+            @click="$router.push('/newSub')"
+          >
+            <v-icon>loop</v-icon>
+          </v-btn>
+          <span>Add new Subscription</span>
+        </v-tooltip>
+        <v-tooltip v-model="fab" left>
+          <v-btn
+            fab
+            dark
+            small
+            color="red"
+            slot="activator"
+            @click="$router.push('/detailed')"
+          >
+            <v-icon>zoom_in</v-icon>
+          </v-btn>
+          <span>View Detailed transactions</span>
+        </v-tooltip>
+      </v-speed-dial> 
     </v-toolbar>
     <v-content>
       <router-view></router-view>
