@@ -19,7 +19,7 @@
           <v-flex xs12>
             <v-card color="blue-grey darken-2" class="white--text">
               <v-card-title primary-title><div class="headline">Graph</div></v-card-title>
-              <v-responsive id="myDiv"></v-responsive>
+              <v-responsive id="spendGraph"></v-responsive>
             </v-card>
           </v-flex>
         </v-layout>
@@ -28,7 +28,7 @@
 </template>
 <script>
 import Plotly from "plotly.js-basic-dist";
-import { layout, scatter } from "plotly-js-material-design-theme";
+import { layout, scatter, index } from "plotly-js-material-design-theme";
 import Router from "vue-router";
 
 export default {
@@ -50,22 +50,35 @@ export default {
           x: this.transactionData["dates"],
           y: this.transactionData["spend"],
           type: "scatter",
-          connectgaps: true
+          connectgaps: true,
+          mode: 'lines'
         })
       ];
 
       var currentMonth = new Date().toLocaleDateString("en-uk", {
         month: "long"
       });
-      var layout = {
+
+      var new_layout = {
         title: currentMonth + " spending",
         showlegend: false,
-        yaxis: { fixedrange: true },
-        xaxis: { fixedrange: true },
+        yaxis: {
+          title: "Balance",
+          fixedrange: true,
+          showline: true,
+          linecolor: "#ffffff"
+        },
+        xaxis: {
+          title: "Date",
+          fixedrange: true,
+          showgrid: false,
+          showline: true,
+          linecolor: "#ffffff"
+        },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
         font: {
-          color: "#ffffff"
+          color: '#ffffff'
         }
       };
 
@@ -74,7 +87,7 @@ export default {
         responsive: true
       };
 
-      Plotly.newPlot("myDiv", data, layout, options);
+      Plotly.newPlot("spendGraph", data, new_layout, options);
     },
     add: function() {
       this.$router.push("/camera");
@@ -85,8 +98,8 @@ export default {
       date.setDate(1);
       var month = date.getMonth();
       var days = [];
-      while(date.getMonth() == month) {
-        days.push(date.toISOString())
+      while (date.getMonth() == month) {
+        days.push(date.toISOString());
         date.setDate(date.getDate() + 1);
       }
       this.transactionData["dates"] = days;
