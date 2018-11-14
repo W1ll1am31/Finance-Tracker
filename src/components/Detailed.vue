@@ -44,6 +44,12 @@
                             <v-flex xs12 sm6 md4>
                                 <v-text-field v-model="singleTransaction.location" label="Location"></v-text-field>
                             </v-flex>
+                            <v-flex xs12 sm6 md4>
+                                <v-radio-group v-model="singleTransaction.direction" row>
+                                  <v-radio label="Incoming" value="incoming"></v-radio>
+                                  <v-radio label="Outgoing" value="outgoing"></v-radio>
+                                </v-radio-group>
+                            </v-flex>
                         </v-layout>
                     </v-container>
                 </v-card-text>
@@ -51,6 +57,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+                    <v-btn color="blue darken-1" flat @click.native="deleteTransaction">Delete</v-btn>
                     <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
                 </v-card-actions>
             </v-card>
@@ -100,18 +107,20 @@ export default {
         "transactions",
         JSON.stringify(this.transactions)
       );
+      this.close();
     },
     close: function() {
       this.dialog = false;
       this.singleTransaction = {};
+      this.selectedIndex = -1;
     },
     save: function() {
-        this.transactions[this.selectedIndex] = this.singleTransaction;
-        window.localStorage.setItem(
+      this.transactions[this.selectedIndex] = this.singleTransaction;
+      window.localStorage.setItem(
         "transactions",
         JSON.stringify(this.transactions)
       );
-      this.dialog = false;
+      this.close();
     },
     loadDummyData: function() {
       let data = {

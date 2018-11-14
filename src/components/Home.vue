@@ -51,7 +51,7 @@ export default {
           y: this.transactionData["spend"],
           type: "scatter",
           connectgaps: true,
-          mode: 'lines'
+          mode: "lines"
         })
       ];
 
@@ -78,7 +78,7 @@ export default {
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
         font: {
-          color: '#ffffff'
+          color: "#ffffff"
         }
       };
 
