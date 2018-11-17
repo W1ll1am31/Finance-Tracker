@@ -1,12 +1,13 @@
 <template>
     <v-card>
         <h1>Detailed View</h1>
-        <v-btn @click="loadDummyData()">loadDummyData</v-btn>
+        <v-btn @click="clearData()">Clear Data</v-btn>
         <v-data-table
             :headers="headers"
             :items="transactions"
             class="elevation-1"
             xs12
+            :pagination.sync="pagination"
             >
             <template slot="items" slot-scope="props">
                 <tr @click="editTransaction(props.item)">
@@ -16,8 +17,8 @@
                 </tr>
             </template>
             <template slot="no-data">
-                <v-alert :value="true" color="error" icon="warning">
-                    Sorry, nothing to display here :(
+                <v-alert :value="true" color="error" outline icon="warning">
+                    No transactions available
                 </v-alert>
             </template>
         </v-data-table>
@@ -79,7 +80,11 @@ export default {
       transactions: [],
       dialog: false,
       singleTransaction: {},
-      selectedIndex: -1
+      selectedIndex: -1,
+      pagination: {
+        sortBy: "dateTime",
+        descending: true
+      }
     };
   },
   created: function() {
@@ -122,15 +127,9 @@ export default {
       );
       this.close();
     },
-    loadDummyData: function() {
-      let data = {
-        name: "tran 1",
-        amount: 10,
-        catagory: "shop",
-        dateTime: "today",
-        location: "that place"
-      };
-      window.localStorage.setItem("transactions", JSON.stringify([data]));
+    clearData: function() {
+      window.localStorage.clear();
+      this.transactions = []
     }
   }
 };
