@@ -13,7 +13,7 @@
                 <tr @click="editTransaction(props.item)">
                     <td>{{ props.item.dateTime }}</td>
                     <td>{{ props.item.name }}</td>
-                    <td>{{ props.item.amount }}</td>
+                    <td>£{{ props.item.amount }}</td>
                 </tr>
             </template>
             <template slot="no-data">
@@ -22,19 +22,25 @@
                 </v-alert>
             </template>
         </v-data-table>
-        <v-dialog v-model="dialog">
+        <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
             <v-card>
                 <v-card-title>
-                    <span class="headline">Detailed Transaction</span>
+                  <v-text-field class="headline" v-model="singleTransaction.name" label="Transaction name"></v-text-field>
                 </v-card-title>
                 <v-card-text>
                     <v-container grid-list-md>
                         <v-layout wrap>
                             <v-flex xs12 sm6 md4>
-                                <v-text-field v-model="singleTransaction.name" label="Transaction name"></v-text-field>
-                            </v-flex>
-                            <v-flex xs12 sm6 md4>
-                                <v-text-field v-model="singleTransaction.amount" label="Amount"></v-text-field>
+                                <v-text-field
+                                  :rules="[() => !!singleTransaction.amount || 'This field is required']"
+                                  v-model="singleTransaction.amount"
+                                  type="number"
+                                  label="Amount"
+                                  placeholder="10.00"
+                                  prefix="£"
+                                  required
+                                  @change="amountChange"
+                                ></v-text-field>
                             </v-flex>
                             <v-flex xs12 sm6 md4>
                                 <v-text-field v-model="singleTransaction.catagory" label="Catagory"></v-text-field>
@@ -130,6 +136,11 @@ export default {
     clearData: function() {
       window.localStorage.clear();
       this.transactions = []
+    },
+    amountChange: function(value) {
+      if(value) {
+        this.singleTransaction.amount = parseFloat(value).toFixed(2);
+      }
     }
   }
 };

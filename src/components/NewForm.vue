@@ -124,8 +124,10 @@
         if(!formHasErrors) {
           let transactions = JSON.parse(window.localStorage.getItem("transactions"))
           let newTransaction = JSON.parse(JSON.stringify(this.formItems))
+          if(transactions == null) {
+            transactions = [];
+          }
           newTransaction.id = this.generateRandomID();
-          console.log(newTransaction)
           transactions.push(newTransaction)
           window.localStorage.setItem("transactions", JSON.stringify(transactions))
           this.snackbar = true;
