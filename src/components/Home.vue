@@ -24,6 +24,29 @@
           </v-flex>
         </v-layout>
       </v-container>
+      <v-dialog v-model="setupDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Welcome to your new Finance Tracker!</span>
+          </v-card-title>
+          <v-card-text>
+              As part of the initial setup you need to enter your starting balance. This will only need to done once and everything will be based of this value, so don't lie!
+          </v-card-text>
+            <v-text-field
+              :rules="[() => !!startingBalance || 'This field is required']"
+              v-model="startingBalance"
+              type="number"
+              label="Starting Balance"
+              placeholder="100.00"
+              prefix="£"
+              required
+            ></v-text-field>
+          <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="saveStartingBalance">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-card>
 </template>
 <script>
@@ -34,16 +57,25 @@ import Router from "vue-router";
 export default {
   data: function() {
     return {
-      currentBalance: null,
       transactionData: {},
-      currentBalance: 100
+      currentBalance: null,
+      startingBalance: null,
+      setupDialog: false
     };
   },
   mounted: function() {
+    this.startingBalance = window.localStorage.getItem("startingBalance")
+    if(this.startingBalance == null) {
+      this.setupDialog = true;
+    }
     this.getTransactionData();
     this.createGraph();
   },
   methods: {
+    saveStartingBalance: function() {
+      window.localStorage.setItem("startingBalance", this.startingBalance)
+      this.setupDialog = false
+    },
     createGraph: function() {
       var data = [
         scatter({
@@ -89,21 +121,53 @@ export default {
 
       Plotly.newPlot("spendGraph", data, new_layout, options);
     },
-    add: function() {
-      this.$router.push("/camera");
-    },
     getTransactionData: function() {
-      var cost = [1, 3, 6, 4, null, 10];
+      this.currentBalance = parseInt(this.startingBalance);
+      console.log("starting at " + this.currentBalance)
+      let transactions = JSON.parse(window.localStorage.getItem("transactions"));
+      if(transactions == null) {
+        this.transactionData.dates = null;
+        this.transactionData.spend = null;
+        return;
+      }
+      transactions = this.split(transactions);
+
       var date = new Date();
       date.setDate(1);
       var month = date.getMonth();
-      var days = [];
+      var days = [date.toISOString().substring(0, 10)];
+      var cost = [this.currentBalance]
       while (date.getMonth() == month) {
-        days.push(date.toISOString());
+        let currentDate = date.toISOString().substring(0, 10);
+        if(transactions[currentDate]) {
+          days.push(currentDate);
+          for(let transaction of transactions[currentDate]) {
+            this.currentBalance += parseInt(transaction);
+          }
+          cost.push(this.currentBalance);
+        }
         date.setDate(date.getDate() + 1);
       }
       this.transactionData["dates"] = days;
       this.transactionData["spend"] = cost;
+    },
+    compare: function(a,b) {
+      if (a.dateTime < b.dateTime)
+        return -1;
+      if (a.dateTime > b.dateTime)
+        return 1;
+      return 0;
+    },
+    split: function(transactions) {
+      let splitData = {}
+      for(let transaction of transactions) {
+        if(!(transaction.dateTime in Object.keys(splitData))) {
+          splitData[transaction.dateTime] = []
+        }
+        splitData[transaction.dateTime].push(transaction.amount * (transaction.direction =="outgoing" ? -1 : 1))
+      }
+
+      return splitData;
     }
   }
 };
