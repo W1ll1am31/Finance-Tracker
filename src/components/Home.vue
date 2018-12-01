@@ -19,7 +19,7 @@
           <v-flex xs12>
             <v-card color="blue-grey darken-2" class="white--text">
               <v-card-title primary-title><div class="headline">Graph</div></v-card-title>
-              <v-responsive id="spendGraph"></v-responsive>
+              <v-responsive id="spendGraph" @click="$router.push('/detailed')"></v-responsive>
             </v-card>
           </v-flex>
         </v-layout>
@@ -64,17 +64,33 @@ export default {
     };
   },
   mounted: function() {
-    this.startingBalance = window.localStorage.getItem("startingBalance")
+    this.startingBalance = window.localStorage.getItem("startingBalance");
+    let currentDate = new Date();
+
     if(this.startingBalance == null) {
       this.setupDialog = true;
-    }
-    this.getTransactionData();
+    } else if(window.localStorage.getItem("firstCalculation") == "true") {
+      let retValue = this.getTransactionData(currentDate.getMonth());
+      this.transactionData = retValue.transactionData;
+      this.currentBalance = retValue.currentBalance;
+    } else {
+      let retValue = this.getTransactionData(currentDate.getMonth()-1);
+      this.startingBalance = retValue.currentBalance;
+      localStorage.setItem("startingBalance", this.startingBalance);
+      retValue = this.getTransactionData(currentDate.getMonth());
+      this.transactionData = retValue.transactionData;
+      this.currentBalance = retValue.currentBalance;
+      window.localStorage.setItem("firstCalculation", true)
+}
+
     this.createGraph();
   },
   methods: {
     saveStartingBalance: function() {
-      window.localStorage.setItem("startingBalance", this.startingBalance)
-      this.setupDialog = false
+      window.localStorage.clear();
+      window.localStorage.setItem("startingBalance", parseFloat(this.startingBalance).toFixed(2));
+      this.currentBalance = parseFloat(this.startingBalance).toFixed(2);
+      this.setupDialog = false;
     },
     createGraph: function() {
       var data = [
@@ -121,50 +137,62 @@ export default {
 
       Plotly.newPlot("spendGraph", data, new_layout, options);
     },
-    getTransactionData: function() {
-      this.currentBalance = parseInt(this.startingBalance);
-      console.log("starting at " + this.currentBalance)
-      let transactions = JSON.parse(window.localStorage.getItem("transactions"));
-      if(transactions == null) {
-        this.transactionData.dates = null;
-        this.transactionData.spend = null;
-        return;
+    getTransactionData: function(month) {
+      let lCurrentBalance = parseFloat(this.startingBalance).toFixed(2);
+      // this.currentBalance = parseFloat(this.startingBalance).toFixed(2);
+      let transactions = JSON.parse(
+        window.localStorage.getItem("transactions")
+      );
+      if (transactions == null) {
+        return {
+          transactionData: {
+            dates: null,
+            spend: null
+          },
+          currentBalance: lCurrentBalance
+        }
       }
       transactions = this.split(transactions);
 
       var date = new Date();
+      date.setMonth(month);
       date.setDate(1);
-      var month = date.getMonth();
       var days = [date.toISOString().substring(0, 10)];
-      var cost = [this.currentBalance]
+      var cost = [lCurrentBalance];
       while (date.getMonth() == month) {
         let currentDate = date.toISOString().substring(0, 10);
-        if(transactions[currentDate]) {
+        if (transactions[currentDate]) {
           days.push(currentDate);
-          for(let transaction of transactions[currentDate]) {
-            this.currentBalance += parseInt(transaction);
+          for (let transaction of transactions[currentDate]) {
+            lCurrentBalance = parseFloat(lCurrentBalance) + parseFloat(transaction);
           }
-          cost.push(this.currentBalance);
+          lCurrentBalance = parseFloat(lCurrentBalance).toFixed(2);
+          cost.push(lCurrentBalance);
         }
         date.setDate(date.getDate() + 1);
       }
-      this.transactionData["dates"] = days;
-      this.transactionData["spend"] = cost;
+      return {
+        transactionData: {
+          dates: days,
+          spend: cost
+        },
+        currentBalance: lCurrentBalance
+      }
     },
-    compare: function(a,b) {
-      if (a.dateTime < b.dateTime)
-        return -1;
-      if (a.dateTime > b.dateTime)
-        return 1;
+    compare: function(a, b) {
+      if (a.dateTime < b.dateTime) return -1;
+      if (a.dateTime > b.dateTime) return 1;
       return 0;
     },
     split: function(transactions) {
-      let splitData = {}
-      for(let transaction of transactions) {
-        if(!(transaction.dateTime in Object.keys(splitData))) {
-          splitData[transaction.dateTime] = []
+      let splitData = {};
+      for (let transaction of transactions) {
+        if (!(transaction.dateTime in Object.keys(splitData))) {
+          splitData[transaction.dateTime] = [];
         }
-        splitData[transaction.dateTime].push(transaction.amount * (transaction.direction =="outgoing" ? -1 : 1))
+        splitData[transaction.dateTime].push(
+          transaction.amount * (transaction.direction == "outgoing" ? -1 : 1)
+        );
       }
 
       return splitData;
