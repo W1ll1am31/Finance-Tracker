@@ -76,6 +76,19 @@
                                     <v-radio label="Outgoing" value="outgoing"></v-radio>
                                   </v-radio-group>
                               </v-flex>
+                              <div>
+                              <v-img
+                                ref="image"
+                                :src="singleTransaction.image"
+                                v-if="singleTransaction.image"
+                                height="125"
+                                class="grey darken-4"
+                              ></v-img>
+                              <v-icon v-else>
+                                add_a_photo
+                              </v-icon>
+                              Add photo of receipt
+                            </div>
                           </v-layout>
                       </v-container>
                   </v-card-text>

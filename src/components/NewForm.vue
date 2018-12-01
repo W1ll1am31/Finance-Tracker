@@ -61,6 +61,19 @@
             <v-radio label="Incoming" value="incoming"></v-radio>
             <v-radio label="Outgoing" value="outgoing"></v-radio>
           </v-radio-group>
+          <div @click="addPhoto">
+            <v-img
+              ref="image"
+              :src="image"
+              v-if="image"
+              height="125"
+              class="grey darken-4"
+            ></v-img>
+            <v-icon v-else>
+              add_a_photo
+            </v-icon>
+            Add photo of receipt
+          </div>
         </v-card-text>
         <v-divider class="mt-5"></v-divider>
         <v-card-actions>
@@ -94,7 +107,7 @@
         location: null,
         catagory: null,
         direction: "outgoing",
-        dateTime: new Date().toISOString().substr(0, 10),
+        dateTime: new Date().toISOString().substr(0, 10)
       },
       initialState: {
         name: null,
@@ -102,8 +115,9 @@
         location: null,
         catagory: null,
         direction: "outgoing",
-        dateTime: new Date().toISOString().substr(0, 10),
-      }
+        dateTime: new Date().toISOString().substr(0, 10)
+      },
+      image: null
     }),
     computed: {
       minDate: function() {
@@ -118,6 +132,7 @@
             this.$refs[f].resetValidation();
             this.formItems[f] = this.initialState[f];
           })
+          this.image = null;
       },
       submit () {
         let formHasErrors = false
@@ -135,6 +150,7 @@
             transactions = [];
           }
           newTransaction.id = this.generateRandomID();
+          newTransaction.image = this.image
           transactions.push(newTransaction)
           window.localStorage.setItem("transactions", JSON.stringify(transactions))
           this.snackbar = true;
@@ -147,6 +163,17 @@
       amountChange: function(value) {
         if(value) {
           this.formItems.amount = parseFloat(value).toFixed(2);
+        }
+      },
+      addPhoto: function() {
+        if (window.location.protocol === 'file:' || window.location.port === '3000') {
+          navigator.camera.getPicture(imageData => {
+            this.image = imageData;
+          }, message => {
+            window.alert("Cannot take picture: " + message)
+          }, { quality: 50, destinationType: Camera.DestinationType.FILE_URI, saveToPhotoAlbum: true });
+        } else {
+          window.alert("Adding images only supported on devices, not through NPM")
         }
       }
     }
