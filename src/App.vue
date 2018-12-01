@@ -68,7 +68,7 @@
             slot="activator"
             @click="$router.push('/about')"
           >
-            <v-icon>zoom_in</v-icon>
+            <v-icon>info</v-icon>
           </v-btn>
           <span>About</span>
         </v-tooltip>

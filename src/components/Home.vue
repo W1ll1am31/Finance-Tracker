@@ -81,11 +81,29 @@ export default {
       this.transactionData = retValue.transactionData;
       this.currentBalance = retValue.currentBalance;
       window.localStorage.setItem("firstCalculation", true)
+      this.deleteOldEntries(retValue.transactionData);
 }
 
     this.createGraph();
   },
   methods: {
+    deleteOldEntries: function(okayValueList) {
+      okayValueList = okayValueList.dates.sort(this.compare);
+      console.log(okayValueList);
+      let allTransactions = JSON.parse(
+        window.localStorage.getItem("transactions")
+      );
+      allTransactions.sort(this.compare)
+      let firstIndex = allTransactions.indexOf(allTransactions.find(trans => {
+        return trans.dateTime === okayValueList[0];
+      }))
+      console.log(allTransactions, firstIndex);
+      if(firstIndex > 0) {
+        allTransactions = allTransactions.splice(firstIndex, allTransactions.length);
+        console.log(allTransactions)
+        window.localStorage.setItem("transactions", JSON.stringify(allTransactions))
+      }
+    },
     saveStartingBalance: function() {
       window.localStorage.clear();
       window.localStorage.setItem("startingBalance", parseFloat(this.startingBalance).toFixed(2));
