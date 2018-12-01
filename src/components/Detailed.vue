@@ -64,7 +64,7 @@
                                       append-icon="event"
                                       readonly
                                     ></v-text-field>
-                                    <v-date-picker v-model="singleTransaction.dateTime" @input="dateMenu = false"></v-date-picker>
+                                    <v-date-picker v-model="singleTransaction.dateTime" @input="dateMenu = false" :min="minDate"></v-date-picker>
                                   </v-menu>
                               </v-flex>
                               <v-flex xs12 sm6 md4>
@@ -112,6 +112,13 @@ export default {
       },
       dateMenu: false
     };
+  },
+  computed: {
+    minDate: function() {
+      let date = new Date()
+      date.setDate(1);
+      return date.toISOString().split('T')[0];
+    }
   },
   created: function() {
     this.transactions = this.getTransactions();

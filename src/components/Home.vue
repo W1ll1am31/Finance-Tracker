@@ -205,7 +205,7 @@ export default {
     split: function(transactions) {
       let splitData = {};
       for (let transaction of transactions) {
-        if (!(transaction.dateTime in Object.keys(splitData))) {
+        if (Object.keys(splitData).indexOf(transaction.dateTime) == -1) {
           splitData[transaction.dateTime] = [];
         }
         splitData[transaction.dateTime].push(

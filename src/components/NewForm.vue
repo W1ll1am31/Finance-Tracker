@@ -41,7 +41,7 @@
               append-icon="event"
               readonly
             ></v-text-field>
-            <v-date-picker v-model="formItems.dateTime" @input="menu2 = false"></v-date-picker>
+            <v-date-picker v-model="formItems.dateTime" @input="menu2 = false" :min="minDate"></v-date-picker>
           </v-menu>
           <v-text-field
             ref="location"
@@ -105,6 +105,13 @@
         dateTime: new Date().toISOString().substr(0, 10),
       }
     }),
+    computed: {
+      minDate: function() {
+        let date = new Date()
+        date.setDate(1);
+        return date.toISOString().split('T')[0];
+      }
+    },
     methods: {
       resetForm () {
           Object.keys(this.formItems).forEach(f => {
