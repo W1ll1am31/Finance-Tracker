@@ -66,11 +66,11 @@
             small
             color="red"
             slot="activator"
-            @click="$router.push('/detailed')"
+            @click="$router.push('/about')"
           >
             <v-icon>zoom_in</v-icon>
           </v-btn>
-          <span>View Detailed transactions</span>
+          <span>About</span>
         </v-tooltip>
       </v-speed-dial> 
     </v-toolbar>
@@ -123,7 +123,8 @@ export default {
     },
     onBackKeyDown() {
       // Handle the back-button event on Android. By default it will exit the app.
-      navigator.app.exitApp();
+      // navigator.app.exitApp();
+      this.$router.go(-1);
     }
   }
 };

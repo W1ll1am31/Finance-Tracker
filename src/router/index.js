@@ -5,6 +5,7 @@ import CameraTest from '@/components/CameraTest'
 import Detailed from '@/components/Detailed'
 import NewForm from '@/components/NewForm'
 import NewSubscription from '@/components/NewSubscription'
+import About from '@/components/About'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router({
       path: '/newSub',
       name: 'New Subscription',
       component: NewSubscription
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: About
     }
   ]
 })
