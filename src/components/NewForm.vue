@@ -173,7 +173,9 @@
             window.alert("Cannot take picture: " + message)
           }, { quality: 50, destinationType: Camera.DestinationType.FILE_URI, saveToPhotoAlbum: true });
         } else {
-          window.alert("Adding images only supported on devices, not through NPM")
+          window.alert("Adding images only supported on devices, not through NPM. Giving a random image")
+          let randomIndex = Math.floor(Math.random() * 86);
+          this.singleTransaction.image = "https://picsum.photos/510/300?image=" + randomIndex
         }
       }
     }

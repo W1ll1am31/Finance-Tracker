@@ -76,19 +76,24 @@
                                     <v-radio label="Outgoing" value="outgoing"></v-radio>
                                   </v-radio-group>
                               </v-flex>
-                              <div>
-                              <v-img
-                                ref="image"
-                                :src="singleTransaction.image"
-                                v-if="singleTransaction.image"
-                                height="125"
-                                class="grey darken-4"
-                              ></v-img>
-                              <v-icon v-else>
-                                add_a_photo
-                              </v-icon>
-                              Add photo of receipt
-                            </div>
+                              <div v-if="singleTransaction.image">
+                                <v-img
+                                  @click="addPhoto"
+                                  ref="image"
+                                  :src="singleTransaction.image"
+                                  height="125"
+                                  class="grey darken-4"
+                                ></v-img>
+                                <v-btn fab @click="deleteImage">
+                                  <v-icon>close</v-icon>
+                                </v-btn>
+                              </div>
+                              <v-btn fab v-else @click="addPhoto">
+                                <v-icon>
+                                  add_a_photo
+                                </v-icon>
+                                Add photo of receipt
+                              </v-btn>
                           </v-layout>
                       </v-container>
                   </v-card-text>
@@ -137,6 +142,22 @@ export default {
     this.transactions = this.getTransactions();
   },
   methods: {
+    addPhoto: function() {
+      if (window.location.protocol === 'file:' || window.location.port === '3000') {
+        navigator.camera.getPicture(imageData => {
+          this.singleTransaction.image = imageData;
+        }, message => {
+          window.alert("Cannot take picture: " + message)
+        }, { quality: 50, destinationType: Camera.DestinationType.FILE_URI, saveToPhotoAlbum: true });
+      } else {
+        window.alert("Adding images only supported on devices, not through NPM")
+        let randomIndex = Math.floor(Math.random() * 86);
+        this.singleTransaction.image = "https://picsum.photos/510/300?image=" + randomIndex
+      }
+    },
+    deleteImage: function() {
+      this.singleTransaction.image = null
+    },
     getTransactions: function() {
       let transactions = JSON.parse(
         window.localStorage.getItem("transactions")
@@ -149,7 +170,7 @@ export default {
     },
     editTransaction: function(item) {
       this.dialog = true;
-      this.singleTransaction = item;
+      this.singleTransaction = JSON.parse(JSON.stringify(item));
       this.selectedIndex = this.transactions.indexOf(item);
     },
     deleteTransaction: function(item) {
@@ -167,10 +188,9 @@ export default {
     },
     save: function() {
       let formHasErrors = false;
-      console.log(this.$refs)
+      let doNotCheck = ["id", "image"];
       Object.keys(this.singleTransaction).forEach(f => {
-        if(f != "id") {
-          console.log(f)
+        if(doNotCheck.indexOf(f) == -1) {
           if (!this.$refs[f].valid) {
             formHasErrors = true;
           }
@@ -179,7 +199,9 @@ export default {
       });
 
       if (!formHasErrors) {
+        console.log(JSON.parse(JSON.stringify(this.transactions)), this.selectedIndex)
         this.transactions[this.selectedIndex] = this.singleTransaction;
+        console.log(JSON.parse(JSON.stringify(this.transactions)), this.selectedIndex)
         window.localStorage.setItem(
           "transactions",
           JSON.stringify(this.transactions)
