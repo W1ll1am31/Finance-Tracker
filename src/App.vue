@@ -46,7 +46,7 @@
           </v-btn>
           <span>Add new expense</span>
         </v-tooltip>
-        <v-tooltip v-model="fab" left>
+        <!-- <v-tooltip v-model="fab" left>
           <v-btn
             fab
             dark
@@ -58,7 +58,7 @@
             <v-icon>loop</v-icon>
           </v-btn>
           <span>Add new Subscription</span>
-        </v-tooltip>
+        </v-tooltip> -->
         <v-tooltip v-model="fab" left>
           <v-btn
             fab
