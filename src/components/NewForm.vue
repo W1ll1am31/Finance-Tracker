@@ -2,6 +2,9 @@
   <v-layout justify-center>
     <v-flex xs12 sm10 md8 lg6>
       <v-card>
+        <v-card-title>
+          New Transaction
+        </v-card-title>
         <v-card-text>
           <v-text-field
             ref="name"
@@ -37,7 +40,7 @@
               ref="dateTime"
               slot="activator"
               v-model="formItems.dateTime"
-              label="Picker without buttons"
+              label="Transaction Date"
               append-icon="event"
               readonly
             ></v-text-field>
@@ -61,18 +64,25 @@
             <v-radio label="Incoming" value="incoming"></v-radio>
             <v-radio label="Outgoing" value="outgoing"></v-radio>
           </v-radio-group>
-          <div @click="addPhoto">
-            <v-img
-              ref="image"
-              :src="image"
-              v-if="image"
-              height="125"
-              class="grey darken-4"
-            ></v-img>
-            <v-icon v-else>
-              add_a_photo
-            </v-icon>
-            Add photo of receipt
+          <div>
+            <div v-if="image">
+              <v-img
+                @click="addPhoto"
+                ref="image"
+                :src="image"
+                height="125"
+                class="grey darken-4"
+              ></v-img>
+              <v-btn fab @click="image = null">
+                <v-icon>close</v-icon>
+              </v-btn>
+            </div>
+            <v-btn fab v-else @click="addPhoto">
+              <v-icon>
+                add_a_photo
+              </v-icon>
+            </v-btn>
+            Image of receipt
           </div>
         </v-card-text>
         <v-divider class="mt-5"></v-divider>
@@ -175,7 +185,7 @@
         } else {
           window.alert("Adding images only supported on devices, not through NPM. Giving a random image")
           let randomIndex = Math.floor(Math.random() * 86);
-          this.singleTransaction.image = "https://picsum.photos/510/300?image=" + randomIndex
+          this.image = "https://picsum.photos/510/300?image=" + randomIndex
         }
       }
     }
