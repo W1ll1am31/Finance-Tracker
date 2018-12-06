@@ -19,7 +19,7 @@
           <v-flex xs12>
             <v-card color="blue-grey darken-2" class="white--text">
               <v-card-title primary-title><div class="headline">Graph</div></v-card-title>
-              <v-responsive id="spendGraph" @click="$router.push('/detailed')"></v-responsive>
+              <v-responsive id="spendGraph"></v-responsive>
             </v-card>
           </v-flex>
         </v-layout>
